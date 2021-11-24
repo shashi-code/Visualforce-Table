@@ -1,0 +1,103 @@
+<apex:page extensions="InvoicePDFController" standardController="Quote" showHeader="false" applyHtmlTag="false" renderAs="pdf">
+    
+    <html>
+        <head>
+            <style>
+               
+                
+                table {
+                border-collapse: collapse;
+                border:none;
+                width: 100%;
+                margin-bottom:15px;
+                font-style:roboto;
+                }
+                
+                th {
+                text-align: center;
+                }
+                table tr:nth-child(odd) {
+                background: #ccc;
+                }
+                
+            </style> 
+        </head>  
+        <body>
+            
+            <div style="margin-bottom:20px;">
+                
+                <div style="display:inline-block">
+                    <apex:image url="{!$Resource.Logo_Demo}" width="100" height="90"/>  
+                </div>  
+                <div style="display:inline-block; font-family: 'Roboto', sans-serif;">
+                    <strong>Clotus</strong><br/>
+                    Ranchi,<br/> demo
+                    Address <br/> 00000<br/>
+                    <strong>www.clotus.com</strong>
+                </div>  
+                
+                <div style="float:right; display:inline-block; font-family: 'Roboto', sans-serif;">
+                    <strong style="float:right">Quote</strong><br/>
+                    No: {!Quote.QuoteNumber}<br/>
+                    Date: {!today()}
+                </div>
+            </div>
+            <br/>
+            <div width="100%">
+                <div style="display:inline; font-family: 'Roboto', sans-serif;" >
+                    <strong>Quote For:</strong><br/>
+                    {!Quote.BillingName}
+                </div>
+                <div style="float:right; font-family: 'Roboto', sans-serif;">
+                    <Strong>Phone: </Strong>{!Quote.Phone}
+                </div>
+            </div>
+            <div width="100%">
+                <div width="50%" style="display:inline; font-family: 'Roboto', sans-serif;">
+                    {!Quote.BillingStreet}<br/>
+                    {!Quote.BillingCity}, {!Quote.BillingState}, {!Quote.BillingPostalCode}
+                </div>
+                <div style="float:right; font-family: 'Roboto', sans-serif;" width="50%">
+                    <Strong>Job Location: </Strong> {!Quote.ShippingStreet}
+                </div>
+            </div>
+            
+            <br/>
+            <br/>
+            
+            <hr style="border:2px solid #FDD20A;"/>
+            <br/>
+            
+            
+            
+            <apex:repeat value="{!QuoteIdAndQLGs}" var="lg">
+                <table   style="margin=top:20px" width="100%">
+                    <tr style="background-color:#6D6E71; color:White ;  font-family: 'Roboto', sans-serif;" >
+                        <th colspan="6"  style="padding:5px; text-align: left;">{!lg.Name}<span style="padding:5px; float:right">${!lg.Group_Price__c}</span></th>
+                    </tr>
+                    <tr style="font-size:14px; font-family: 'Roboto', sans-serif;">
+                        <th style="text-align: left;" width="40%">Product</th>
+                        <th  width="7%">UOM</th>
+                        <th  width="9%">Size</th>
+                        <th  width="7%">Color</th>
+                        <th  width="7%">Qty</th>
+                        <th style="text-align: left;" width="30%">Description</th>
+                    </tr>
+                    <apex:variable var="count" value="{!0}"/>
+                    <apex:repeat value="{!mapOfQLG_IdIdAndQLIs[lg.Id]}" var="val">
+                        <tr style="text-align: center; font-size:12px; {!IF(MOD(count,2)==0, 'background-color: #E5E7E9;','background-color: #FFFFFF;')}; font-family: 'Roboto', sans-serif;">
+                            <td style="text-align: left;">{!val.Product2.Name}</td>
+                            <td>{!val.UOM__c}</td>
+                            <td>{!val.Size__c}</td>
+                            <td>{!val.Color__c}</td>
+                            <td>{!val.Quantity}</td>
+                            <td style="text-align: left;">{!val.Description__c}</td>
+                            <apex:variable var="count" value="{!count+1}"/>
+                        </tr>         
+                    </apex:repeat>
+                </table>
+            </apex:repeat>
+        </body>
+    </html>
+    
+</apex:page>

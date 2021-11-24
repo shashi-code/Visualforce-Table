@@ -1,0 +1,40 @@
+public class InvoicePDFController {
+    public Quote qt {get; set;}
+    public List<Quote_Line_Group__c> QuoteIdAndQLGs {get; set;}
+    public Map<Id, List<QuoteLineItem>> mapOfQLG_IdIdAndQLIs {get; set;}
+   
+    public invoicePDFController(ApexPages.StandardController controller){
+        this.qt= (Quote)controller.getRecord();
+        QuoteIdAndQLGs = new List<Quote_Line_Group__c>();
+        mapOfQLG_IdIdAndQLIs = new Map<Id, List<QuoteLineItem>>();
+		//this.lg= [select id, Name from Quote_Line_Group__c where Quote__c=:qt.Id];
+        getAllQLIsFROMQLGOfQuote(qt.Id);
+    }
+    
+    public void getAllQLIsFROMQLGOfQuote(Id quoteId) {
+        Set<Id> qlgIds = new Set<Id>();
+        for (Quote_Line_Group__c qlg : [SELECT Id, Name, Group_Price__c
+                                        FROM Quote_Line_Group__c
+                                        WHERE Quote__c=:quoteId])
+        {
+            qlgIds.add(qlg.Id);
+            QuoteIdAndQLGs.add(qlg);
+        }
+        
+        if (!qlgIds.isEmpty()) {
+            for (QuoteLineItem qli : [SELECT Id, Quantity, Color__c,Product2Id, UOM__c, Size__c, Description__c,Product2.Name, UnitPrice,  Quote_Line_Group__c 
+                                      FROM QuoteLineItem
+                                      WHERE Quote_Line_Group__c IN: qlgIds])
+            {
+                if (mapOfQLG_IdIdAndQLIs.containsKey(qli.Quote_Line_Group__c)) {
+                    List<QuoteLineItem> temp = mapOfQLG_IdIdAndQLIs.get(qli.Quote_Line_Group__c);
+                    temp = temp.size() > 0?temp: new List<QuoteLineItem>();
+                    temp.add(qli);
+                    mapOfQLG_IdIdAndQLIs.put(qli.Quote_Line_Group__c, temp);
+                } else {
+                    mapOfQLG_IdIdAndQLIs.put(qli.Quote_Line_Group__c, new List<QuoteLineItem> {qli});
+                }
+            }
+        }
+    }    
+}
